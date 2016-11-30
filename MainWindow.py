@@ -2,7 +2,12 @@
 __author__="KenLee"
 __email__="ken_4000@qq.com"
 
-import Tkinter
+try:
+	#python 2.x
+	import Tkinter as Tkinter
+except ImportError:
+	#python 3.x
+	import tkinter as Tkinter
 import os
 import sys
 import imp
@@ -15,12 +20,12 @@ def loadFunctionRec(path,nowDict):
 		if os.path.isdir(filePath):
 			#如果是目录
 			nowDict[fileName]={}
-			loadFunctions(filePath,nowDict[fileName])
+			loadFunctionRec(filePath,nowDict[fileName])
 		else:
 			#如果是文件
 			if fileName.endswith('py'):
 				moduleName=fileName[0:-3]
-				nowDict[fileName[0:-3]]=imp.load_module(moduleName,*imp.find_module(moduleName,[path]))
+				nowDict[fileName[0:-3]]=[fileName[0:-3],imp.load_module(moduleName,*imp.find_module(moduleName,[path]))]
 	pass
 
 def testRec(nowDict):
@@ -28,26 +33,26 @@ def testRec(nowDict):
 		for k in nowDict.keys():
 			testRec(nowDict[k])
 	else:
-		nowDict.test()
+		nowDict[1].test()
 	pass
 
 def createMenuBarRec(nowDict,nowMenu):
 	if isinstance(nowDict,dict):
-		
+		pass
 	pass
 
 def main():
 
 	loadFunctionRec(os.path.join(os.path.abspath('.'),"Functions"),funcsDict)
 	testRec(funcsDict)
+	print(funcsDict)
+	#rootTk=Tkinter.Tk()
+	#menubar=Tkinter.Menu(rootTk)
+	#fileMenu=Tkinter.Menu(menubar,tearoff=0)
+	#menubar.add_cascade(label="File",menu=fileMenu)
 
-	rootTk=Tkinter.Tk()
-	menubar=Tkinter.Menu(rootTk)
-	fileMenu=Tkinter.Menu(menubar,tearoff=0)
-	menubar.add_cascade(label="File",menu=fileMenu)
-
-	rootTk.config(menu=menubar)
-	rootTk.mainloop()
+	#rootTk.config(menu=menubar)
+	#rootTk.mainloop()
 	pass
 
 
