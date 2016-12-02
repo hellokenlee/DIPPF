@@ -12,52 +12,68 @@ import os
 import sys
 import imp
 
-funcsDict={}
-def loadFunctionRec(path,nowDict):
-	fileList=os.listdir(path)
-	for fileName in fileList:
-		filePath=os.path.join(path,fileName)
-		if os.path.isdir(filePath):
-			#如果是目录
-			nowDict[fileName]={}
-			loadFunctionRec(filePath,nowDict[fileName])
-		else:
-			#如果是文件
-			if fileName.endswith('py'):
-				moduleName=fileName[0:-3]
-				nowDict[fileName[0:-3]]=[fileName[0:-3],imp.load_module(moduleName,*imp.find_module(moduleName,[path]))]
-	pass
 
-def testRec(nowDict):
-	if isinstance(nowDict,dict):
-		for k in nowDict.keys():
-			testRec(nowDict[k])
-	else:
-		nowDict[1].test()
-	pass
 
-def createMenuBarRec(nowDict,nowMenu):
-	if isinstance(nowDict,dict):
+class MainWindow(object):
+	"""docstring for MainWindow"""
+	def __init__(self):
+		super(MainWindow, self).__init__()
+		self.funcsDict = {}
+
+	def loadFunction(self,path):
+		self.funcsDict={}
+		self.__loadFunctionRec(path,self.funcsDict)
 		pass
-	pass
 
-def printIOU():
-	print("IOU")
-	pass
+	def testFunctions(self):
+		self.__testRec(self.funcsDict)
+		pass
 
+	def __loadFunctionRec(self,path,nowDict):
+		fileList=os.listdir(path)
+		for fileName in fileList:
+			filePath=os.path.join(path,fileName)
+			if os.path.isdir(filePath):
+				#如果是目录
+				nowDict[fileName]={}
+				self.__loadFunctionRec(filePath,nowDict[fileName])
+			else:
+				#如果是文件
+				if fileName.endswith('py'):
+					moduleName=fileName[0:-3]
+					nowDict[fileName[0:-3]]=[fileName[0:-3],imp.load_module(moduleName,*imp.find_module(moduleName,[path]))]
+		pass
+
+	def __testRec(self,nowDict):
+		if isinstance(nowDict,dict):
+			for k in nowDict.keys():
+				self.__testRec(nowDict[k])
+		else:
+			if nowDict[0][0:4]=="test":
+				nowDict[1].process()
+		pass
+
+	def __createMenuBarRec(self,nowDict,nowMenu):
+		if isinstance(nowDict,dict):
+			for key in nowDict.keys():
+				newMenu=Tkinter.Menu(nowMenu,tearoff=0)
+				nowMenu.add_cascade(label=)
+		else:
+			nowMenu.add_command(label=nowDict[0],command=nowDict[1])
+		pass
+		
 def main():
-
-	##loadFunctionRec(os.path.join(os.path.abspath('.'),"Functions"),funcsDict)
-	##funcsDict['Chapter1']['test1'][1].test()
+	mw = MainWindow()
+	mw.loadFunction(os.path.join(os.path.abspath('.'),"Functions"))
 	rootTk=Tkinter.Tk()
 	menubar=Tkinter.Menu(rootTk)
-	
 	fileMenu=Tkinter.Menu(menubar,tearoff=0)
-	fileMenu.add_command(label="New",command=printIOU)
+	fileMenu.add_command(label="Cut")
+	subMenu=Tkinter.Menu(fileMenu,tearoff=0)
+	fileMenu.add_cascade(label="subMenu",menu=subMenu)
+	subMenu.add_command(label="subsubs")
 	menubar.add_cascade(label="File",menu=fileMenu)
 
-
-	menubar.insert_separator(2)
 	rootTk.config(menu=menubar)
 	rootTk.mainloop()
 	pass
