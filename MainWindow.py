@@ -41,18 +41,25 @@ def createMenuBarRec(nowDict,nowMenu):
 		pass
 	pass
 
+def printIOU():
+	print("IOU")
+	pass
+
 def main():
 
-	loadFunctionRec(os.path.join(os.path.abspath('.'),"Functions"),funcsDict)
-	testRec(funcsDict)
-	print(funcsDict)
-	#rootTk=Tkinter.Tk()
-	#menubar=Tkinter.Menu(rootTk)
-	#fileMenu=Tkinter.Menu(menubar,tearoff=0)
-	#menubar.add_cascade(label="File",menu=fileMenu)
+	##loadFunctionRec(os.path.join(os.path.abspath('.'),"Functions"),funcsDict)
+	##funcsDict['Chapter1']['test1'][1].test()
+	rootTk=Tkinter.Tk()
+	menubar=Tkinter.Menu(rootTk)
+	
+	fileMenu=Tkinter.Menu(menubar,tearoff=0)
+	fileMenu.add_command(label="New",command=printIOU)
+	menubar.add_cascade(label="File",menu=fileMenu)
 
-	#rootTk.config(menu=menubar)
-	#rootTk.mainloop()
+
+	menubar.insert_separator(2)
+	rootTk.config(menu=menubar)
+	rootTk.mainloop()
 	pass
 
 
