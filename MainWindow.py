@@ -12,29 +12,39 @@ import os
 import sys
 import imp
 
-
-
 class MainWindow(object):
 	"""docstring for MainWindow"""
 	def __init__(self):
-		super(MainWindow, self).__init__()
 		self.funcsDict = {}
+		pass
 
 	def loadFunction(self,path):
 		self.funcsDict={}
 		self.__loadFunctionRec(path,self.funcsDict)
+		print(self.funcsDict)
 		pass
 
 	def testFunctions(self):
 		self.__testRec(self.funcsDict)
 		pass
 
+	def createMenuBar(self):
+		self.rootTk=Tkinter.Tk()
+		self.menubar=Tkinter.Menu(self.rootTk)
+		self.__createMenuBarRec(self.funcsDict,self.menubar)
+		print("done!",self.menubar)
+		self.rootTk.config(menu=self.menubar)
+		pass
+
+	def show(self):
+		self.rootTk.mainloop()
+		pass
 
 	def __loadFunctionRec(self,path,nowDict):
 		fileList=os.listdir(path)
 		for fileName in fileList:
 			filePath=os.path.join(path,fileName)
-			if os.path.isdir(filePath):
+			if os.path.isdir(filePath) and (not filePath.endswith("__")):
 				#如果是目录
 				nowDict[fileName]={}
 				self.__loadFunctionRec(filePath,nowDict[fileName])
@@ -42,41 +52,36 @@ class MainWindow(object):
 				#如果是文件
 				if fileName.endswith('py'):
 					moduleName=fileName[0:-3]
-					nowDict[fileName[0:-3]]=[fileName[0:-3],imp.load_module(moduleName,*imp.find_module(moduleName,[path]))]
+					nowDict[moduleName]=imp.load_module(moduleName,*imp.find_module(moduleName,[path]))
 		pass
 
 	def __testRec(self,nowDict):
-		if isinstance(nowDict,dict):
-			for k in nowDict.keys():
-				self.__testRec(nowDict[k])
-		else:
-			if nowDict[0][0:4]=="test":
-				nowDict[1].process()
+		for key in nowDict.keys():
+			if isinstance(nowDict[key],dict):
+				self.__testRec(nowDict[key])
+			else:
+				nowDict[key].process();
+
 		pass
 
 	def __createMenuBarRec(self,nowDict,nowMenu):
-		if isinstance(nowDict,dict):
-			for key in nowDict.keys():
+		for key in nowDict.keys():
+			if isinstance(nowDict[key],dict):
+				print(key," is dict")
 				newMenu=Tkinter.Menu(nowMenu,tearoff=0)
-				nowMenu.add_cascade(label=)
-		else:
-			nowMenu.add_command(label=nowDict[0],command=nowDict[1])
-		pass
+				nowMenu.add_cascade(label=key,menu=newMenu)
+				self.__createMenuBarRec(nowDict[key],newMenu)
+			else:
+				print(key," is module")
+				nowMenu.add_command(label=key,command=nowDict[key].process)
 		
+		pass
+
 def main():
 	mw = MainWindow()
 	mw.loadFunction(os.path.join(os.path.abspath('.'),"Functions"))
-	rootTk=Tkinter.Tk()
-	menubar=Tkinter.Menu(rootTk)
-	fileMenu=Tkinter.Menu(menubar,tearoff=0)
-	fileMenu.add_command(label="Cut")
-	subMenu=Tkinter.Menu(fileMenu,tearoff=0)
-	fileMenu.add_cascade(label="subMenu",menu=subMenu)
-	subMenu.add_command(label="subsubs")
-	menubar.add_cascade(label="File",menu=fileMenu)
-
-	rootTk.config(menu=menubar)
-	rootTk.mainloop()
+	mw.createMenuBar()
+	mw.show()
 	pass
 
 
