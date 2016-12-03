@@ -28,6 +28,7 @@ class MainWindow(object):
 		self.__testRec(self.funcsDict)
 		pass
 
+
 	def createMenuBar(self):
 		self.rootTk=Tkinter.Tk()
 		self.menubar=Tkinter.Menu(self.rootTk)

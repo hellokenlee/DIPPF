@@ -1,10 +1,6 @@
 # -*- coding:utf-8 -*-
 
-import os
-
-def process():
-	print("Testing from Chapter2.")
+def test():
+	print("Hello From testing in chap2")
 	pass
 
-if __name__ == '__main__':
-	process()
