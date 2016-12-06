@@ -9,8 +9,9 @@ try:
 except ImportError:
 	#python 3.x
 	import tkinter as Tkinter
+	import tkinter.filedialog as tkFileDialog
 import PIL
-import Image,ImageTk
+from PIL import Image,ImageTk
 import os
 import sys
 import imp
@@ -23,10 +24,19 @@ class MainWindow(object):
 	def __init__(self):
 		self.funcsDict = {}
 		self.rootTk=Tkinter.Tk()
+		self.rootTk.geometry("640x480")
 		self.rootTk.title("DIP Tools")
+		self.pilImg=None
+		self.tkImg=None
+		self.img=None
+		self.canvas=Tkinter.Canvas(self.rootTk)
+		self.canvas.pack(side=Tkinter.TOP,expand=True,fill=Tkinter.BOTH)
+
 		self.menubar=Tkinter.Menu(self.rootTk)
 		self.rootTk.config(menu=self.menubar)
 		self.createDefaultMenu()
+		
+		
 		pass
 
 	#	加载制定目录下的所有模块
@@ -63,14 +73,26 @@ class MainWindow(object):
 	#---private:---
 	def __imageOpen(self):
 		filePath=tkFileDialog.askopenfilename(parent=self.rootTk)
-		print("Open Image:",filePath)
-		canvas=Tkinter.Canvas(self.rootTk,width=500,height=500)
-		canvas.pack(side=Tkinter.TOP,expand=True,fill=Tkinter.BOTH)
-		self.pilImg=Image.open(filePath)
-		self.pilImg=self.pilImg.resize((300,300),PIL.Image.ANTIALIAS)
-		self.tkImg=ImageTk.PhotoImage(self.pilImg)
-		self.img=canvas.create_image(100,80,image=self.tkImg)
+		if not filePath:
+			return None
+
+		winWidth=self.rootTk.winfo_width()
+		winHeight=self.rootTk.winfo_height()
+		print("Current Windwo size:",winWidth," x ",winHeight)
 		
+		self.pilImg=Image.open(filePath)
+		print("Open Image:",filePath,"  ",self.pilImg.height," x ",self.pilImg.width)
+		
+		tmp=self.pilImg
+		if  tmp.height>winHeight:
+			scale=min(float(winHeight)/float(self.pilImg.height),float(winWidth)/float(self.pilImg.width))
+			scaledWidth=int(self.pilImg.width*scale)
+			scaledHeight=int(self.pilImg.height*scale)
+			print("Image resize to ",scaledWidth," x ",scaledHeight)
+			tmp=self.pilImg.resize((scaledWidth,scaledHeight),PIL.Image.ANTIALIAS)
+		
+		self.tkImg=ImageTk.PhotoImage(tmp)
+		self.img=self.canvas.create_image(winWidth/2,winHeight/2,image=self.tkImg)
 		pass
 
 	def __imageSave(self):
