@@ -2,8 +2,8 @@
 
 import os
 
-def process():
-	print("Another Testing from Chapter1.")
+def process(obj):
+	print("Another Testing from Chapter1.",obj)
 	pass
 
 if __name__ == '__main__':

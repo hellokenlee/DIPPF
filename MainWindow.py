@@ -12,6 +12,7 @@ except ImportError:
 	import tkinter.filedialog as tkFileDialog
 import PIL
 from PIL import Image,ImageTk
+from functools import partial
 import os
 import sys
 import imp
@@ -29,14 +30,13 @@ class MainWindow(object):
 		self.pilImg=None
 		self.tkImg=None
 		self.img=None
+		self.pilImgPath=[]
 		self.canvas=Tkinter.Canvas(self.rootTk)
 		self.canvas.pack(side=Tkinter.TOP,expand=True,fill=Tkinter.BOTH)
 
 		self.menubar=Tkinter.Menu(self.rootTk)
 		self.rootTk.config(menu=self.menubar)
 		self.createDefaultMenu()
-		
-		
 		pass
 
 	#	加载制定目录下的所有模块
@@ -72,25 +72,31 @@ class MainWindow(object):
 
 	#---private:---
 	def __imageOpen(self):
+		#	弹出文件选择框
 		filePath=tkFileDialog.askopenfilename(parent=self.rootTk)
+		#	处理取消选择
 		if not filePath:
 			return None
-
+		self.pilImgPath.append(filePath)
+		#	获取窗口大小
 		winWidth=self.rootTk.winfo_width()
 		winHeight=self.rootTk.winfo_height()
-		print("Current Windwo size:",winWidth," x ",winHeight)
-		
+		print("Current Windwo size:"+str(winWidth)+" x "+str(winHeight))
+		#	打开图片
 		self.pilImg=Image.open(filePath)
-		print("Open Image:",filePath,"  ",self.pilImg.height," x ",self.pilImg.width)
+		print("Open Image:"+filePath+"  "+str(self.pilImg.size[0])+" x "+str(self.pilImg.size[1]))
 		
+		#	对当前窗口不能显示的图片进行缩放
 		tmp=self.pilImg
-		if  tmp.height>winHeight:
+		tmp.width=self.pilImg.size[0]
+		tmp.height=self.pilImg.size[1]
+		if  tmp.height > winHeight:
 			scale=min(float(winHeight)/float(self.pilImg.height),float(winWidth)/float(self.pilImg.width))
 			scaledWidth=int(self.pilImg.width*scale)
 			scaledHeight=int(self.pilImg.height*scale)
-			print("Image resize to ",scaledWidth," x ",scaledHeight)
+			print("Image resize to "+str(scaledWidth)+" x "+str(scaledHeight))
 			tmp=self.pilImg.resize((scaledWidth,scaledHeight),PIL.Image.ANTIALIAS)
-		
+		#	显示在窗口中央
 		self.tkImg=ImageTk.PhotoImage(tmp)
 		self.img=self.canvas.create_image(winWidth/2,winHeight/2,image=self.tkImg)
 		pass
@@ -130,7 +136,7 @@ class MainWindow(object):
 				nowMenu.add_cascade(label=key,menu=newMenu)
 				self.__createMenuBarRec(nowDict[key],newMenu)
 			else:
-				nowMenu.add_command(label=key,command=nowDict[key].process)
+				nowMenu.add_command(label=key,command=partial(nowDict[key].process,self.pilImgPath))
 		
 		pass
 
